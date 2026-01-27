@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FSTBANK Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: #27ae60;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 8px rgba(39, 174, 96, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(39, 174, 96, 0);
+            }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #667eea;
+        }
+        
+        .stat-card.clients { border-left-color: #3498db; }
+        .stat-card.accounts { border-left-color: #27ae60; }
+        .stat-card.transactions { border-left-color: #f39c12; }
+        .stat-card.balance { border-left-color: #e74c3c; }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .data-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .badge-valid {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .badge-rejected {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        
+        .badge-simple {
+            background: #d6eaf8;
+            color: #3498db;
+        }
+        
+        .badge-partage {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .badge-pro {
+            background: #fdebd0;
+            color: #d68910;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .error {
+            background: #fadbd8;
+            color: #c0392b;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: #7f8c8d;
+            margin-top: 30px;
+        }
+        
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            float: right;
+        }
+        
+        .refresh-btn:hover {
+            background: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏦 FSTBANK Dashboard</h1>
+            <div class="status">
+                <div class="status-indicator"></div>
+                <span id="app-status">Application RUNNING</span>
+                <button class="refresh-btn" onclick="loadAllData()">🔄 Refresh</button>
+            </div>
+        </header>
+        
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card clients">
+                <div class="stat-label">Total Clients</div>
+                <div class="stat-value" id="stat-clients">-</div>
+            </div>
+            <div class="stat-card accounts">
+                <div class="stat-label">Total Accounts</div>
+                <div class="stat-value" id="stat-accounts">-</div>
+            </div>
+            <div class="stat-card transactions">
+                <div class="stat-label">Total Transactions</div>
+                <div class="stat-value" id="stat-transactions">-</div>
+            </div>
+            <div class="stat-card balance">
+                <div class="stat-label">Total Balance</div>
+                <div class="stat-value" id="stat-balance">-</div>
+            </div>
+        </div>
+        
+        <!-- Clients Section -->
+        <div class="data-section">
+            <h2 class="section-title">👥 Clients</h2>
+            <div id="clients-container" class="loading">Loading clients...</div>
+        </div>
+        
+        <!-- Accounts Section -->
+        <div class="data-section">
+            <h2 class="section-title">💳 Comptes Bancaires</h2>
+            <div id="accounts-container" class="loading">Loading accounts...</div>
+        </div>
+        
+        <!-- Transactions Section -->
+        <div class="data-section">
+            <h2 class="section-title">💰 Transactions</h2>
+            <div id="transactions-container" class="loading">Loading transactions...</div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2026 FSTBANK - Gestion Bancaire EJB3 | Version 1.0.0</p>
+        </footer>
+    </div>
+    
+    <script>
+        const API_BASE = '/fstbank/api/dashboard';
+        
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'EUR'
+            }).format(value);
+        }
+        
+        function getTypeBadge(type) {
+            switch(type) {
+                case 'PARTICULIER_SIMPLE':
+                    return '<span class="badge badge-simple">Simple</span>';
+                case 'PARTICULIER_PARTAGE':
+                    return '<span class="badge badge-partage">Partagé</span>';
+                case 'PROFESSIONNEL':
+                    return '<span class="badge badge-pro">Professionnel</span>';
+                case 'PARTICULIER':
+                    return '<span class="badge badge-simple">Particulier</span>';
+                default:
+                    return '<span class="badge">' + type + '</span>';
+            }
+        }
+        
+        function getStatusBadge(status) {
+            if (status === 'VALIDEE') {
+                return '<span class="badge badge-valid">✓ Validée</span>';
+            } else if (status === 'REJETEE') {
+                return '<span class="badge badge-rejected">✗ Rejetée</span>';
+            }
+            return '<span class="badge">' + status + '</span>';
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch(API_BASE + '/stats');
+                const stats = await response.json();
+                
+                document.getElementById('stat-clients').textContent = stats.totalClients;
+                document.getElementById('stat-accounts').textContent = stats.totalAccounts;
+                document.getElementById('stat-transactions').textContent = stats.totalTransactions;
+                document.getElementById('stat-balance').textContent = formatCurrency(stats.totalBalance);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        async function loadClients() {
+            try {
+                const response = await fetch(API_BASE + '/clients');
+                const clients = await response.json();
+                
+                let html = '<table><thead><tr><th>ID</th><th>Identifiant</th><th>Nom</th><th>Email</th><th>Type</th></tr></thead><tbody>';
+                
+                clients.forEach(client => {
+                    const typeBadge = client.type === 'PROFESSIONNEL' 
+                        ? '<span class="badge badge-pro">Pro</span>'
+                        : '<span class="badge badge-simple">Part</span>';
+                    
+                    html += `<tr>
+                        <td>${client.id}</td>
+                        <td><strong>${client.identifiant}</strong></td>
+                        <td>${client.nom} ${client.prenom}</td>
+                        <td>${client.email}</td>
+                        <td>${typeBadge}</td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table>';
+                document.getElementById('clients-container').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading clients:', error);
+                document.getElementById('clients-container').innerHTML = '<div class="error">Failed to load clients</div>';
+            }
+        }
+        
+        async function loadAccounts() {
+            try {
+                const response = await fetch(API_BASE + '/accounts');
+                const accounts = await response.json();
+                
+                let html = '<table><thead><tr><th>ID</th><th>Numéro</th><th>Solde</th><th>Type</th><th>Propriétaire</th></tr></thead><tbody>';
+                
+                accounts.forEach(account => {
+                    const owner = account.owner || account.owners || 'N/A';
+                    html += `<tr>
+                        <td>${account.id}</td>
+                        <td><strong>${account.numero}</strong></td>
+                        <td style="font-weight: 600; color: #27ae60;">${formatCurrency(account.solde)}</td>
+                        <td>${getTypeBadge(account.type)}</td>
+                        <td>${owner}</td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table>';
+                document.getElementById('accounts-container').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading accounts:', error);
+                document.getElementById('accounts-container').innerHTML = '<div class="error">Failed to load accounts</div>';
+            }
+        }
+        
+        async function loadTransactions() {
+            try {
+                const response = await fetch(API_BASE + '/transactions');
+                const transactions = await response.json();
+                
+                let html = '<table><thead><tr><th>ID</th><th>Montant</th><th>Type</th><th>Statut</th><th>Comptes</th><th>Date</th></tr></thead><tbody>';
+                
+                transactions.forEach(tx => {
+                    const comptes = tx.from && tx.to 
+                        ? `${tx.from} → ${tx.to}`
+                        : (tx.compte || 'N/A');
+                    
+                    html += `<tr>
+                        <td>${tx.id}</td>
+                        <td style="font-weight: 600; color: #e74c3c;">${formatCurrency(tx.montant)}</td>
+                        <td><strong>${tx.type}</strong></td>
+                        <td>${getStatusBadge(tx.statut)}</td>
+                        <td>${comptes}</td>
+                        <td>${tx.date}</td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table>';
+                document.getElementById('transactions-container').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                document.getElementById('transactions-container').innerHTML = '<div class="error">Failed to load transactions</div>';
+            }
+        }
+        
+        async function loadAllData() {
+            await loadStats();
+            await loadClients();
+            await loadAccounts();
+            await loadTransactions();
+        }
+        
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadAllData);
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadAllData, 30000);
+    </script>
+</body>
+</html>

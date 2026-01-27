@@ -1,31 +1,14 @@
 package dz.fst.bank.entities;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "BANQUIERS")
-public class Banquier implements Serializable {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(name = "IDENTIFIANT", unique = true, nullable = false, length = 50)
-    private String identifiant;
-    
-    @Column(name = "NOM", nullable = false, length = 100)
-    private String nom;
+public class Banquier extends Utilisateur {
     
     @Column(name = "PRENOM", nullable = false, length = 100)
     private String prenom;
-    
-    @Column(name = "EMAIL", nullable = false, unique = true, length = 100)
-    private String email;
-    
-    @Column(name = "MOT_DE_PASSE", nullable = false)
-    private String motDePasse;
     
     @Column(name = "MATRICULE", unique = true, length = 20)
     private String matricule;
@@ -36,37 +19,20 @@ public class Banquier implements Serializable {
     
     // Constructeurs
     public Banquier() {
+        super();
         this.dateEmbauche = new Date();
     }
     
     public Banquier(String identifiant, String nom, String prenom, 
                    String email, String motDePasse) {
-        this();
-        this.identifiant = identifiant;
-        this.nom = nom;
+        super(identifiant, nom, email, motDePasse);
         this.prenom = prenom;
-        this.email = email;
-        this.motDePasse = motDePasse;
+        this.dateEmbauche = new Date();
     }
     
-    // Getters et Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public String getIdentifiant() { return identifiant; }
-    public void setIdentifiant(String identifiant) { this.identifiant = identifiant; }
-    
-    public String getNom() { return nom; }
-    public void setNom(String nom) { this.nom = nom; }
-    
+    // Getters et Setters (héritées de Utilisateur: id, identifiant, nom, email, motDePasse, dateCreation)
     public String getPrenom() { return prenom; }
     public void setPrenom(String prenom) { this.prenom = prenom; }
-    
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    
-    public String getMotDePasse() { return motDePasse; }
-    public void setMotDePasse(String motDePasse) { this.motDePasse = motDePasse; }
     
     public String getMatricule() { return matricule; }
     public void setMatricule(String matricule) { this.matricule = matricule; }

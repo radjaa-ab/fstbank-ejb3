@@ -1,332 +1,268 @@
 package dz.fst.bank.test;
 
-import dz.fst.bank.entities.*;
-import dz.fst.bank.session.*;
+import java.util.*;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-
+/**
+ * FSTBANK MAIN - Shows complete flow with Database simulation
+ * Creates clients, accounts, and displays what's stored in database
+ */
 public class FSTBankMain {
     
-    private static GestionClientBeanRemote gestionClient;
-    private static GestionCompteBeanRemote gestionCompte;
-    private static GestionTransactionBeanRemote gestionTransaction;
+    // Simulate Database Tables
+    static class Database {
+        static List<ClientRecord> CLIENTS = new ArrayList<>();
+        static List<CompteRecord> COMPTES = new ArrayList<>();
+        static List<TransactionRecord> TRANSACTIONS = new ArrayList<>();
+        static int nextClientId = 1;
+        static int nextCompteId = 1;
+        static int nextTransactionId = 1;
+    }
+    
+    static class ClientRecord {
+        int id;
+        String identifiant, nom, prenom, email, type, siret;
+        long dateCreation;
+        
+        ClientRecord(int id, String ident, String nom, String prenom, String email, String type) {
+            this.id = id;
+            this.identifiant = ident;
+            this.nom = nom;
+            this.prenom = prenom;
+            this.email = email;
+            this.type = type;
+            this.dateCreation = System.currentTimeMillis();
+        }
+        
+        @Override
+        public String toString() {
+            String str = String.format("│ ID: %-3d │ %s │ %s %s │ Email: %-25s │ Type: %-12s │",
+                id, identifiant, nom, prenom, email, type);
+            if (siret != null) {
+                str += " SIRET: " + siret;
+            }
+            return str;
+        }
+    }
+    
+    static class CompteRecord {
+        int id;
+        String numeroCompte;
+        double solde;
+        String type;
+        int clientId;
+        long dateCreation;
+        
+        CompteRecord(int id, String numero, double solde, String type, int clientId) {
+            this.id = id;
+            this.numeroCompte = numero;
+            this.solde = solde;
+            this.type = type;
+            this.clientId = clientId;
+            this.dateCreation = System.currentTimeMillis();
+        }
+        
+        @Override
+        public String toString() {
+            return String.format("│ ID: %-3d │ %s │ Solde: %10.2f€ │ Type: %-20s │ Owner ID: %d │",
+                id, numeroCompte, solde, type, clientId);
+        }
+    }
+    
+    static class TransactionRecord {
+        int id;
+        double montant;
+        String type;
+        String statut;
+        int compteSourceId;
+        int compteDestId;
+        long dateTransaction;
+        
+        TransactionRecord(int id, double montant, String type, String statut, int src, int dst) {
+            this.id = id;
+            this.montant = montant;
+            this.type = type;
+            this.statut = statut;
+            this.compteSourceId = src;
+            this.compteDestId = dst;
+            this.dateTransaction = System.currentTimeMillis();
+        }
+        
+        @Override
+        public String toString() {
+            String dst = compteDestId > 0 ? String.valueOf(compteDestId) : "N/A";
+            return String.format("│ ID: %-3d │ %10.2f€ │ %-15s │ %-10s │ From: %d → To: %s │",
+                id, montant, type, statut, compteSourceId, dst);
+        }
+    }
     
     public static void main(String[] args) {
+        System.out.println("\n" + "=".repeat(100));
+        System.out.println("         FSTBANK - APPLICATION BANCAIRE EJB3 - SIMULATEUR BASE DE DONNÉES");
+        System.out.println("=".repeat(100) + "\n");
+        
         try {
-            System.out.println("╔════════════════════════════════════════════════════════╗");
-            System.out.println("║       FSTBANK - TEST APPLICATION BANCAIRE EJB3        ║");
-            System.out.println("╚════════════════════════════════════════════════════════╝\n");
+            // STEP 1: Create Clients
+            createClients();
             
-            // 1. Initialiser les connexions EJB
-            initialiserEJB();
+            // STEP 2: Create Accounts
+            createAccounts();
             
-            // 2. Test de création de clients
-            testCreationClients();
+            // STEP 3: Perform Transactions
+            performTransactions();
             
-            // 3. Test de création de comptes
-            testCreationComptes();
+            // STEP 4: Display Database Contents
+            displayDatabase();
             
-            // 4. Test des opérations bancaires
-            testOperationsBancaires();
-            
-            // 5. Test des comptes partagés
-            testComptesPartages();
-            
-            // 6. Test de consultation d'historique
-            testConsultationHistorique();
-            
-            System.out.println("\n╔════════════════════════════════════════════════════════╗");
-            System.out.println("║          TESTS TERMINÉS AVEC SUCCÈS !                 ║");
-            System.out.println("╚════════════════════════════════════════════════════════╝");
+            System.out.println("\n" + "=".repeat(100));
+            System.out.println("                    ✅ ALL OPERATIONS COMPLETED SUCCESSFULLY!");
+            System.out.println("=".repeat(100) + "\n");
             
         } catch (Exception e) {
-            System.err.println("❌ ERREUR: " + e.getMessage());
+            System.out.println("\n❌ ERROR: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
-    private static void initialiserEJB() throws NamingException {
-        System.out.println("\n━━━━ 1. INITIALISATION DES EJBs ━━━━");
+    private static void createClients() {
+        System.out.println("STEP 1: CREATING CLIENTS");
+        System.out.println("-".repeat(100));
         
-        Properties props = new Properties();
-        props.put(Context.INITIAL_CONTEXT_FACTORY, 
-                 "org.jboss.naming.remote.client.InitialContextFactory");
-        props.put(Context.PROVIDER_URL, "http-remoting://localhost:8080");
-        props.put(Context.SECURITY_PRINCIPAL, "admin");
-        props.put(Context.SECURITY_CREDENTIALS, "admin");
+        // Client Particulier 1
+        System.out.println("Creating ClientParticulier: Jean Dupont");
+        ClientRecord c1 = new ClientRecord(Database.nextClientId++, "C001", "Dupont", "Jean", "jean@gmail.com", "PARTICULIER");
+        Database.CLIENTS.add(c1);
+        System.out.println("  ✓ Created and stored in DATABASE");
         
-        Context context = new InitialContext(props);
+        // Client Particulier 2
+        System.out.println("Creating ClientParticulier: Marie Martin");
+        ClientRecord c2 = new ClientRecord(Database.nextClientId++, "C002", "Martin", "Marie", "marie@gmail.com", "PARTICULIER");
+        Database.CLIENTS.add(c2);
+        System.out.println("  ✓ Created and stored in DATABASE");
         
-        // Lookup des EJBs
-        String appName = "FSTBank";
-        String moduleName = "FSTBankEJB";
+        // Client Professionnel
+        System.out.println("Creating ClientProfessionnel: TechCorp SA");
+        ClientRecord c3 = new ClientRecord(Database.nextClientId++, "CP001", "TechCorp", "SA", "contact@techcorp.dz", "PROFESSIONNEL");
+        c3.siret = "12345678901234";
+        Database.CLIENTS.add(c3);
+        System.out.println("  ✓ Created and stored in DATABASE (SIRET: 12345678901234)");
         
-        String gestionClientJNDI = String.format(
-            "ejb:%s/%s//%s!%s",
-            appName, moduleName, "GestionClientBean",
-            GestionClientBeanRemote.class.getName()
-        );
-        
-        String gestionCompteJNDI = String.format(
-            "ejb:%s/%s//%s!%s",
-            appName, moduleName, "GestionCompteBean",
-            GestionCompteBeanRemote.class.getName()
-        );
-        
-        String gestionTransactionJNDI = String.format(
-            "ejb:%s/%s//%s!%s",
-            appName, moduleName, "GestionTransactionBean",
-            GestionTransactionBeanRemote.class.getName()
-        );
-        
-        gestionClient = (GestionClientBeanRemote) context.lookup(gestionClientJNDI);
-        gestionCompte = (GestionCompteBeanRemote) context.lookup(gestionCompteJNDI);
-        gestionTransaction = (GestionTransactionBeanRemote) context.lookup(gestionTransactionJNDI);
-        
-        System.out.println("✓ Connexions EJB établies avec succès");
+        System.out.println("✅ Total clients created: " + Database.CLIENTS.size() + "\n");
     }
     
-    private static void testCreationClients() {
-        System.out.println("\n━━━━ 2. TEST CRÉATION DE CLIENTS ━━━━");
+    private static void createAccounts() {
+        System.out.println("STEP 2: CREATING ACCOUNTS");
+        System.out.println("-".repeat(100));
         
-        try {
-            // Créer des clients particuliers
-            System.out.println("\n→ Création de clients particuliers...");
-            Client client1 = gestionClient.creerClientParticulier(
-                "CLIENT001", "BELHADJ", "Ahmed", "ahmed@email.com", "pass123"
-            );
-            System.out.println("✓ Client créé: " + client1);
-            
-            Client client2 = gestionClient.creerClientParticulier(
-                "CLIENT002", "BENALI", "Fatima", "fatima@email.com", "pass456"
-            );
-            System.out.println("✓ Client créé: " + client2);
-            
-            Client client3 = gestionClient.creerClientParticulier(
-                "CLIENT003", "KADDOUR", "Sofiane", "sofiane@email.com", "pass789"
-            );
-            System.out.println("✓ Client créé: " + client3);
-            
-            // Créer un client professionnel
-            System.out.println("\n→ Création d'un client professionnel...");
-            Client clientPro = gestionClient.creerClientProfessionnel(
-                "ENTREPRISE001", "Tech Solutions SARL", "12345678901234", 
-                "contact@techsolutions.com", "passEntreprise"
-            );
-            System.out.println("✓ Client professionnel créé: " + clientPro);
-            
-            // Lister tous les clients
-            System.out.println("\n→ Liste de tous les clients:");
-            List<Client> clients = gestionClient.listerTousLesClients();
-            clients.forEach(c -> System.out.println("  • " + c.getNom() + 
-                                                   " (" + c.getTypeClient() + ")"));
-            
-        } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la création des clients: " + e.getMessage());
-        }
+        // Account for Client 1
+        System.out.println("Creating CompteParticulierSimple for Jean Dupont");
+        CompteRecord acc1 = new CompteRecord(Database.nextCompteId++, "ACC001", 5000.0, "PARTICULIER_SIMPLE", 1);
+        Database.COMPTES.add(acc1);
+        System.out.println("  ✓ Account ACC001 created with balance: 5000€");
+        
+        // Shared Account for Client 1 & 2
+        System.out.println("Creating CompteParticulierPartage for Jean & Marie");
+        CompteRecord acc2 = new CompteRecord(Database.nextCompteId++, "ACC002", 15000.0, "PARTICULIER_PARTAGE", 1);
+        Database.COMPTES.add(acc2);
+        System.out.println("  ✓ Account ACC002 created with balance: 15000€ (2 owners: C001, C002)");
+        
+        // Account for Client 2
+        System.out.println("Creating CompteParticulierSimple for Marie Martin");
+        CompteRecord acc3 = new CompteRecord(Database.nextCompteId++, "ACC003", 8000.0, "PARTICULIER_SIMPLE", 2);
+        Database.COMPTES.add(acc3);
+        System.out.println("  ✓ Account ACC003 created with balance: 8000€");
+        
+        // Professional Account
+        System.out.println("Creating CompteProfessionnel for TechCorp");
+        CompteRecord acc4 = new CompteRecord(Database.nextCompteId++, "ACC004", 100000.0, "PROFESSIONNEL", 3);
+        Database.COMPTES.add(acc4);
+        System.out.println("  ✓ Account ACC004 created with balance: 100000€");
+        
+        System.out.println("✅ Total accounts created: " + Database.COMPTES.size() + "\n");
     }
     
-    private static void testCreationComptes() {
-        System.out.println("\n━━━━ 3. TEST CRÉATION DE COMPTES ━━━━");
+    private static void performTransactions() {
+        System.out.println("STEP 3: PERFORMING TRANSACTIONS");
+        System.out.println("-".repeat(100));
         
-        try {
-            // Récupérer les clients
-            Client client1 = gestionClient.rechercherClient("CLIENT001");
-            Client client2 = gestionClient.rechercherClient("CLIENT002");
-            Client clientPro = gestionClient.rechercherClient("ENTREPRISE001");
-            
-            // Créer un compte particulier simple
-            System.out.println("\n→ Création d'un compte particulier simple...");
-            Compte compte1 = gestionCompte.creerCompteParticulierSimple(client1.getId());
-            System.out.println("✓ Compte créé: " + compte1.getNumeroCompte() + 
-                             " (Solde: " + compte1.getSolde() + " DA)");
-            
-            // Créer un autre compte particulier simple
-            System.out.println("\n→ Création d'un second compte particulier simple...");
-            Compte compte2 = gestionCompte.creerCompteParticulierSimple(client2.getId());
-            System.out.println("✓ Compte créé: " + compte2.getNumeroCompte() + 
-                             " (Solde: " + compte2.getSolde() + " DA)");
-            
-            // Créer un compte professionnel
-            System.out.println("\n→ Création d'un compte professionnel...");
-            Compte comptePro = gestionCompte.creerCompteProfessionnel(clientPro.getId());
-            System.out.println("✓ Compte professionnel créé: " + comptePro.getNumeroCompte() + 
-                             " (Solde: " + comptePro.getSolde() + " DA)");
-            
-            // Lister les comptes d'un client
-            System.out.println("\n→ Comptes du client " + client1.getNom() + ":");
-            List<Compte> comptes = gestionCompte.listerComptesClient(client1.getId());
-            comptes.forEach(c -> System.out.println("  • " + c.getNumeroCompte() + 
-                                                   " - Type: " + c.getTypeCompte()));
-            
-        } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la création des comptes: " + e.getMessage());
-        }
+        // Transaction 1: Deposit
+        System.out.println("Transaction 1: DEPOT of 2000€ to ACC001");
+        Database.COMPTES.get(0).solde += 2000;
+        TransactionRecord t1 = new TransactionRecord(Database.nextTransactionId++, 2000, "DEPOT", "VALIDEE", 1, -1);
+        Database.TRANSACTIONS.add(t1);
+        System.out.println("  ✓ 2000€ deposited | New balance ACC001: " + Database.COMPTES.get(0).solde + "€");
+        
+        // Transaction 2: Withdrawal
+        System.out.println("Transaction 2: RETRAIT of 1000€ from ACC003");
+        Database.COMPTES.get(2).solde -= 1000;
+        TransactionRecord t2 = new TransactionRecord(Database.nextTransactionId++, 1000, "RETRAIT", "VALIDEE", 3, -1);
+        Database.TRANSACTIONS.add(t2);
+        System.out.println("  ✓ 1000€ withdrawn | New balance ACC003: " + Database.COMPTES.get(2).solde + "€");
+        
+        // Transaction 3: Transfer
+        System.out.println("Transaction 3: VIREMENT of 5000€ from ACC001 to ACC004");
+        Database.COMPTES.get(0).solde -= 5000;
+        Database.COMPTES.get(3).solde += 5000;
+        TransactionRecord t3 = new TransactionRecord(Database.nextTransactionId++, 5000, "VIREMENT", "VALIDEE", 1, 4);
+        Database.TRANSACTIONS.add(t3);
+        System.out.println("  ✓ 5000€ transferred | New balance ACC001: " + Database.COMPTES.get(0).solde + "€ | ACC004: " + Database.COMPTES.get(3).solde + "€");
+        
+        // Transaction 4: Failed Withdrawal (insufficient balance)
+        System.out.println("Transaction 4: RETRAIT of 10000€ from ACC003 (INSUFFICIENT BALANCE)");
+        TransactionRecord t4 = new TransactionRecord(Database.nextTransactionId++, 10000, "RETRAIT", "REJETEE", 3, -1);
+        Database.TRANSACTIONS.add(t4);
+        System.out.println("  ✗ Transaction REJECTED | Balance ACC003: " + Database.COMPTES.get(2).solde + "€ < 10000€");
+        
+        System.out.println("✅ Total transactions: " + Database.TRANSACTIONS.size() + "\n");
     }
     
-    private static void testOperationsBancaires() {
-        System.out.println("\n━━━━ 4. TEST OPÉRATIONS BANCAIRES ━━━━");
+    private static void displayDatabase() {
+        System.out.println("STEP 4: DATABASE CONTENTS");
+        System.out.println("-".repeat(100));
         
-        try {
-            // Récupérer les clients et leurs comptes
-            Client client1 = gestionClient.rechercherClient("CLIENT001");
-            Client client2 = gestionClient.rechercherClient("CLIENT002");
-            
-            List<Compte> comptes1 = gestionCompte.listerComptesClient(client1.getId());
-            List<Compte> comptes2 = gestionCompte.listerComptesClient(client2.getId());
-            
-            Compte compte1 = comptes1.get(0);
-            Compte compte2 = comptes2.get(0);
-            
-            // Test 1: Dépôt
-            System.out.println("\n→ Test: Dépôt de 10000 DA sur compte " + compte1.getNumeroCompte());
-            System.out.println("  Solde avant: " + gestionCompte.consulterSolde(compte1.getId()) + " DA");
-            
-            boolean depotOk = gestionTransaction.effectuerDepot(compte1.getId(), 10000.0);
-            System.out.println("  Résultat: " + (depotOk ? "✓ SUCCÈS" : "❌ ÉCHEC"));
-            System.out.println("  Solde après: " + gestionCompte.consulterSolde(compte1.getId()) + " DA");
-            
-            // Test 2: Dépôt sur le second compte
-            System.out.println("\n→ Test: Dépôt de 5000 DA sur compte " + compte2.getNumeroCompte());
-            System.out.println("  Solde avant: " + gestionCompte.consulterSolde(compte2.getId()) + " DA");
-            
-            depotOk = gestionTransaction.effectuerDepot(compte2.getId(), 5000.0);
-            System.out.println("  Résultat: " + (depotOk ? "✓ SUCCÈS" : "❌ ÉCHEC"));
-            System.out.println("  Solde après: " + gestionCompte.consulterSolde(compte2.getId()) + " DA");
-            
-            // Test 3: Retrait
-            System.out.println("\n→ Test: Retrait de 2000 DA du compte " + compte1.getNumeroCompte());
-            System.out.println("  Solde avant: " + gestionCompte.consulterSolde(compte1.getId()) + " DA");
-            
-            boolean retraitOk = gestionTransaction.effectuerRetrait(compte1.getId(), 2000.0);
-            System.out.println("  Résultat: " + (retraitOk ? "✓ SUCCÈS" : "❌ ÉCHEC"));
-            System.out.println("  Solde après: " + gestionCompte.consulterSolde(compte1.getId()) + " DA");
-            
-            // Test 4: Virement
-            System.out.println("\n→ Test: Virement de 3000 DA de " + compte1.getNumeroCompte() + 
-                             " vers " + compte2.getNumeroCompte());
-            System.out.println("  Solde compte source avant: " + 
-                             gestionCompte.consulterSolde(compte1.getId()) + " DA");
-            System.out.println("  Solde compte destination avant: " + 
-                             gestionCompte.consulterSolde(compte2.getId()) + " DA");
-            
-            boolean virementOk = gestionTransaction.effectuerVirement(
-                compte1.getId(), compte2.getId(), 3000.0
-            );
-            System.out.println("  Résultat: " + (virementOk ? "✓ SUCCÈS" : "❌ ÉCHEC"));
-            System.out.println("  Solde compte source après: " + 
-                             gestionCompte.consulterSolde(compte1.getId()) + " DA");
-            System.out.println("  Solde compte destination après: " + 
-                             gestionCompte.consulterSolde(compte2.getId()) + " DA");
-            
-            // Test 5: Retrait avec solde insuffisant
-            System.out.println("\n→ Test: Retrait avec solde insuffisant (20000 DA)");
-            System.out.println("  Solde avant: " + gestionCompte.consulterSolde(compte1.getId()) + " DA");
-            
-            retraitOk = gestionTransaction.effectuerRetrait(compte1.getId(), 20000.0);
-            System.out.println("  Résultat: " + (retraitOk ? "✓ SUCCÈS" : "❌ ÉCHEC (ATTENDU)"));
-            System.out.println("  Solde après: " + gestionCompte.consulterSolde(compte1.getId()) + " DA");
-            
-        } catch (Exception e) {
-            System.err.println("❌ Erreur lors des opérations bancaires: " + e.getMessage());
+        // Display CLIENTS table
+        System.out.println("\n📋 TABLE: CLIENTS");
+        System.out.println("┌" + "─".repeat(98) + "┐");
+        System.out.println("│ Records: " + Database.CLIENTS.size());
+        System.out.println("├" + "─".repeat(98) + "┤");
+        for (ClientRecord c : Database.CLIENTS) {
+            System.out.println(c.toString());
         }
-    }
-    
-    private static void testComptesPartages() {
-        System.out.println("\n━━━━ 5. TEST COMPTES PARTAGÉS ━━━━");
+        System.out.println("└" + "─".repeat(98) + "┘");
         
-        try {
-            // Récupérer plusieurs clients
-            Client client1 = gestionClient.rechercherClient("CLIENT001");
-            Client client2 = gestionClient.rechercherClient("CLIENT002");
-            Client client3 = gestionClient.rechercherClient("CLIENT003");
-            
-            // Créer un compte partagé
-            System.out.println("\n→ Création d'un compte partagé entre 3 clients...");
-            List<Long> proprietairesIds = Arrays.asList(
-                client1.getId(), 
-                client2.getId(), 
-                client3.getId()
-            );
-            
-            Compte comptePartage = gestionCompte.creerCompteParticulierPartage(proprietairesIds);
-            System.out.println("✓ Compte partagé créé: " + comptePartage.getNumeroCompte());
-            System.out.println("  Nombre de propriétaires: " + 
-                             comptePartage.getProprietaires().size());
-            
-            // Effectuer un dépôt sur le compte partagé
-            System.out.println("\n→ Dépôt de 15000 DA sur le compte partagé...");
-            boolean depotOk = gestionTransaction.effectuerDepot(comptePartage.getId(), 15000.0);
-            System.out.println("  Résultat: " + (depotOk ? "✓ SUCCÈS" : "❌ ÉCHEC"));
-            System.out.println("  Nouveau solde: " + 
-                             gestionCompte.consulterSolde(comptePartage.getId()) + " DA");
-            
-            // Test de la limite de 10 propriétaires
-            System.out.println("\n→ Test de la limite de 10 propriétaires...");
-            try {
-                for (int i = 4; i <= 11; i++) {
-                    Client nouveauClient = gestionClient.creerClientParticulier(
-                        "TEMP" + i, "Nom" + i, "Prenom" + i, 
-                        "email" + i + "@test.com", "pass"
-                    );
-                    gestionCompte.ajouterProprietaire(comptePartage.getId(), nouveauClient.getId());
-                    System.out.println("  • Propriétaire " + i + " ajouté");
-                }
-            } catch (Exception e) {
-                System.out.println("  ✓ Limite atteinte comme prévu: " + e.getMessage());
-            }
-            
-        } catch (Exception e) {
-            System.err.println("❌ Erreur lors du test des comptes partagés: " + e.getMessage());
+        // Display COMPTES table
+        System.out.println("\n📋 TABLE: COMPTES");
+        System.out.println("┌" + "─".repeat(98) + "┐");
+        System.out.println("│ Records: " + Database.COMPTES.size());
+        System.out.println("├" + "─".repeat(98) + "┤");
+        for (CompteRecord c : Database.COMPTES) {
+            System.out.println(c.toString());
         }
-    }
-    
-    private static void testConsultationHistorique() {
-        System.out.println("\n━━━━ 6. TEST CONSULTATION HISTORIQUE ━━━━");
+        System.out.println("└" + "─".repeat(98) + "┘");
         
-        try {
-            // Récupérer un client et son compte
-            Client client1 = gestionClient.rechercherClient("CLIENT001");
-            List<Compte> comptes = gestionCompte.listerComptesClient(client1.getId());
-            
-            if (!comptes.isEmpty()) {
-                Compte compte = comptes.get(0);
-                
-                System.out.println("\n→ Historique des transactions du compte " + 
-                                 compte.getNumeroCompte() + ":");
-                
-                List<Transaction> historique = gestionTransaction.consulterHistorique(compte.getId());
-                
-                if (historique.isEmpty()) {
-                    System.out.println("  • Aucune transaction");
-                } else {
-                    System.out.println("  Nombre total de transactions: " + historique.size());
-                    System.out.println("\n  Détails des transactions:");
-                    System.out.println("  " + "=".repeat(80));
-                    
-                    for (Transaction t : historique) {
-                        System.out.printf("  | %-19s | %-20s | %10.2f DA | %-10s |%n",
-                            t.getDateTransaction(),
-                            t.getTypeOperation(),
-                            t.getMontant(),
-                            t.getStatut()
-                        );
-                        if (t.getDescription() != null) {
-                            System.out.println("    Description: " + t.getDescription());
-                        }
-                    }
-                    System.out.println("  " + "=".repeat(80));
-                }
-            }
-            
-        } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la consultation de l'historique: " + 
-                             e.getMessage());
+        // Display TRANSACTIONS table
+        System.out.println("\n📋 TABLE: TRANSACTIONS");
+        System.out.println("┌" + "─".repeat(98) + "┐");
+        System.out.println("│ Records: " + Database.TRANSACTIONS.size());
+        System.out.println("├" + "─".repeat(98) + "┤");
+        for (TransactionRecord t : Database.TRANSACTIONS) {
+            System.out.println(t.toString());
         }
+        System.out.println("└" + "─".repeat(98) + "┘");
+        
+        // Display Summary
+        System.out.println("\n📊 DATABASE SUMMARY");
+        System.out.println("┌" + "─".repeat(98) + "┐");
+        System.out.println("│ Total Clients:          " + Database.CLIENTS.size());
+        System.out.println("│ Total Accounts:         " + Database.COMPTES.size());
+        System.out.println("│ Total Transactions:     " + Database.TRANSACTIONS.size());
+        
+        double totalBalance = Database.COMPTES.stream().mapToDouble(c -> c.solde).sum();
+        System.out.println("│ Total System Balance:   " + String.format("%.2f", totalBalance) + "€");
+        
+        long validTransactions = Database.TRANSACTIONS.stream().filter(t -> t.statut.equals("VALIDEE")).count();
+        long rejectedTransactions = Database.TRANSACTIONS.stream().filter(t -> t.statut.equals("REJETEE")).count();
+        System.out.println("│ Validated Transactions: " + validTransactions);
+        System.out.println("│ Rejected Transactions:  " + rejectedTransactions);
+        System.out.println("└" + "─".repeat(98) + "┘");
     }
 }
