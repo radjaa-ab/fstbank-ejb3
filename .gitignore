@@ -1,0 +1,37 @@
+# Compiled files
+*.class
+*.jar
+*.war
+*.ear
+
+# Build directories
+bin/
+target/
+build/
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.h2.db
+*.sql
+
+# Logs
+*.log
+logs/
+
+# Temp
+*.tmp
+.gradle/
+.m2/
