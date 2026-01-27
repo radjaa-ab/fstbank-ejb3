@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasources xmlns="http://www.jboss.org/ironjacamar/schema">
+    
+    <datasource jndi-name="java:/FSTBankDS" 
+                pool-name="FSTBankPool" 
+                enabled="true" 
+                use-java-context="true">
+        
+        <!-- Pour H2 (Base de données embarquée) -->
+        <connection-url>jdbc:h2:mem:fstbankdb;DB_CLOSE_DELAY=-1</connection-url>
+        <driver>h2</driver>
+        <security>
+            <user-name>sa</user-name>
+            <password></password>
+        </security>
+        
+        <!-- Pool Configuration -->
+        <pool>
+            <min-pool-size>5</min-pool-size>
+            <max-pool-size>20</max-pool-size>
+        </pool>
+        
+    </datasource>
+    
+</datasources>
