@@ -5,6 +5,13 @@
 ### ✅ Pattern 1: Factory Pattern
 **Purpose:** Centralized object creation for flexibility and maintainability
 
+**Justification du choix (EN FRANÇAIS):**
+- **Encapsulation de la création:** Le Factory Pattern encapsule la logique de création d'objets complexes (clients, comptes). Cela centralise la validation et les règles métier.
+- **Extensibilité:** Si on ajoute un nouveau type de client ou de compte, il suffit d'ajouter une nouvelle méthode au factory sans modifier le code existant.
+- **Validation centralisée:** Tous les clients professionnels passent par la validation SIRET (14 chiffres), les comptes partagés vérifient le nombre maximum de propriétaires (10).
+- **Réutilisabilité:** Plutôt que de dupliquer la logique de création dans chaque classe, une seule source de vérité.
+- **Maintenabilité:** Si les règles de création changent (par exemple, format SIRET), on modifie un seul endroit.
+
 **Implementation:**
 - **File:** `src/main/java/dz/fst/bank/factories/ClientFactory.java`
   ```
@@ -31,6 +38,13 @@
 
 ### ✅ Pattern 2: Strategy Pattern
 **Purpose:** Flexible transaction handling based on operation type
+
+**Justification du choix (EN FRANÇAIS):**
+- **Flexibilité algorithmique:** Chaque type d'opération (retrait, dépôt, virement) a une logique différente. Strategy encapsule chaque algorithme dans une classe séparée.
+- **Open/Closed Principle:** On peut ajouter une nouvelle stratégie (ex: virement international) sans modifier le code existant. Juste ajouter une nouvelle classe `StrategieVirementInternational`.
+- **Échange de comportement à l'exécution:** À l'exécution, selon le type d'opération fourni, on sélectionne la stratégie appropriée (polymorphisme).
+- **Testabilité:** Chaque stratégie peut être testée indépendamment.
+- **Séparation des responsabilités:** La logique du retrait ne se mélange pas avec la logique du dépôt.
 
 **Implementation:**
 - **Interface:** `src/main/java/dz/fst/bank/strategies/StrategieOperation.java`
@@ -81,6 +95,13 @@
 
 ### ✅ Pattern 3: Observer Pattern
 **Purpose:** Real-time notifications on account operations
+
+**Justification du choix (EN FRANÇAIS):**
+- **Couplage faible:** Les comptes (sujets) ne connaissent pas les détails des notifications. Ils just notifient les observateurs. Cela permet de changer les notifications sans toucher le code des comptes.
+- **Communication asynchrone:** Les clients reçoivent des notifications en temps réel sans interroger constamment leur compte.
+- **Extensibilité:** On peut ajouter des observateurs supplémentaires (SMS, push notification, audit logs) sans modifier le compte.
+- **Responsabilité unique:** Le compte gère les opérations, l'observateur gère les notifications.
+- **Besoin métier:** Les clients doivent être informés immédiatement des opérations sur leurs comptes (retraits, dépôts, virements).
 
 **Implementation:**
 - **Subject Interface:** `src/main/java/dz/fst/bank/observers/ObservableCompte.java`
@@ -318,18 +339,42 @@ TRANSACTIONS table:
    ✓ Persistence Unit: "FSTBankPU"
    ✓ JTA DataSource: java:/FSTBankDS
    ✓ Provider: Hibernate
-   ✓ Database: H2 embedded
+   ✓ Database: H2 EMBEDDED (SQLite alternative)
    ✓ All entity classes mapped
    ✓ Properties: sql-dialect, schema generation
    ```
+   
+   **Pourquoi H2 au lieu de SQLite?**
+   - H2 et SQLite sont tous deux des bases de données embarquées légères
+   - H2 est plus compatible avec Hibernate et JPA
+   - H2 a une meilleure intégration avec WildFly
+   - Les deux offrent les mêmes avantages: pas d'installation serveur, persistance locale
 
 2. **fstbank-ds.xml** - `config/`
+   ```xml
+   <datasource jndi-name="java:/FSTBankDS" 
+               pool-name="FSTBankPool" 
+               enabled="true" 
+               use-java-context="true">
+       <!-- H2 embedded database (SQLite alternative) -->
+       <connection-url>jdbc:h2:mem:fstbankdb;DB_CLOSE_DELAY=-1</connection-url>
+       <driver>h2</driver>
+       <security>
+           <user-name>sa</user-name>
+           <password></password>
+       </security>
+       <pool>
+           <min-pool-size>5</min-pool-size>
+           <max-pool-size>20</max-pool-size>
+       </pool>
+   </datasource>
    ```
-   ✓ DataSource configuration
-   ✓ JNDI name: java:/FSTBankDS
-   ✓ Connection pool settings
-   ✓ H2 database URL
-   ```
+   
+   **Configuration expliquée:**
+   - `jdbc:h2:mem:fstbankdb` - Base de données H2 en mémoire
+   - `DB_CLOSE_DELAY=-1` - Garde la BD ouverte même après fermeture de connexion
+   - `pool-name="FSTBankPool"` - Connection pooling pour performance
+   - `min-pool-size=5, max-pool-size=20` - Gestion des connexions
 
 ---
 
