@@ -3,7 +3,7 @@ package dz.fst.bank.session;
 import dz.fst.bank.entities.*;
 import dz.fst.bank.strategies.*;
 
-import javax.ejb.Stateless;
+import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -11,8 +11,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
-@Stateless
+@Stateful
 public class GestionTransactionBean implements GestionTransactionBeanRemote {
     
     @PersistenceContext(unitName = "FSTBankPU")
@@ -20,15 +21,24 @@ public class GestionTransactionBean implements GestionTransactionBeanRemote {
     
     private GestionnaireTransaction gestionnaireTransaction;
     
+    // State management
+    private List<Transaction> transactionsSession;
+    
     @PostConstruct
     public void init() {
         gestionnaireTransaction = new GestionnaireTransaction(em);
-        System.out.println(">>> GestionTransactionBean initialisé");
+        transactionsSession = new ArrayList<>();
+        System.out.println(">>> GestionTransactionBean STATEFUL initialisé");
     }
     
     @PreDestroy
-    public void destroy() {
-        System.out.println(">>> GestionTransactionBean détruit");
+    public void cleanup() {
+        transactionsSession.clear();
+        System.out.println(">>> GestionTransactionBean STATEFUL nettoyé");
+    }
+    
+    public List<Transaction> getTransactionsSession() {
+        return transactionsSession;
     }
     
     @Override

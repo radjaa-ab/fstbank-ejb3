@@ -5,28 +5,48 @@ import dz.fst.bank.entities.ClientParticulier;
 import dz.fst.bank.entities.ClientProfessionnel;
 import dz.fst.bank.factories.ClientFactory;
 
-import javax.ejb.Stateless;
+import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
+import java.util.ArrayList;
 
-@Stateless
+@Stateful
 public class GestionClientBean implements GestionClientBeanRemote {
     
     @PersistenceContext(unitName = "FSTBankPU")
     private EntityManager em;
     
+    // State management
+    private Client clientCourant;
+    private List<Client> clientsSession;
+    
     @PostConstruct
     public void init() {
-        System.out.println(">>> GestionClientBean initialisé");
+        clientsSession = new ArrayList<>();
+        System.out.println(">>> GestionClientBean STATEFUL initialisé");
     }
     
     @PreDestroy
-    public void destroy() {
-        System.out.println(">>> GestionClientBean détruit");
+    public void cleanup() {
+        clientsSession.clear();
+        clientCourant = null;
+        System.out.println(">>> GestionClientBean STATEFUL nettoyé");
+    }
+    
+    public Client getClientCourant() {
+        return clientCourant;
+    }
+    
+    public void setClientCourant(Client client) {
+        this.clientCourant = client;
+    }
+    
+    public List<Client> getClientsSession() {
+        return clientsSession;
     }
     
     @Override

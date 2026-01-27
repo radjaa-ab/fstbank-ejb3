@@ -3,7 +3,7 @@ package dz.fst.bank.session;
 import dz.fst.bank.entities.*;
 import dz.fst.bank.factories.CompteFactory;
 
-import javax.ejb.Stateless;
+import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@Stateless
+@Stateful
 public class GestionCompteBean implements GestionCompteBeanRemote {
     
     @PersistenceContext(unitName = "FSTBankPU")
@@ -21,14 +21,33 @@ public class GestionCompteBean implements GestionCompteBeanRemote {
     
     private Random random = new Random();
     
+    // State management
+    private Compte compteCourant;
+    private List<Compte> comptesSession;
+    
     @PostConstruct
     public void init() {
-        System.out.println(">>> GestionCompteBean initialisé");
+        comptesSession = new ArrayList<>();
+        System.out.println(">>> GestionCompteBean STATEFUL initialisé");
     }
     
     @PreDestroy
-    public void destroy() {
-        System.out.println(">>> GestionCompteBean détruit");
+    public void cleanup() {
+        comptesSession.clear();
+        compteCourant = null;
+        System.out.println(">>> GestionCompteBean STATEFUL nettoyé");
+    }
+    
+    public Compte getCompteCourant() {
+        return compteCourant;
+    }
+    
+    public void setCompteCourant(Compte compte) {
+        this.compteCourant = compte;
+    }
+    
+    public List<Compte> getComptesSession() {
+        return comptesSession;
     }
     
     private String genererNumeroCompte() {

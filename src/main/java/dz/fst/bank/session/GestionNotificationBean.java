@@ -4,9 +4,11 @@ import dz.fst.bank.entities.Client;
 import dz.fst.bank.entities.Compte;
 import dz.fst.bank.observers.NotificationClient;
 
-import javax.ejb.Stateless;
+import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,17 +16,40 @@ import java.util.Map;
  * Session Bean pour gérer les notifications des clients
  * Implémente le pattern Observer
  */
-@Stateless
+@Stateful
 public class GestionNotificationBean implements GestionNotificationBeanRemote {
     
     @PersistenceContext(unitName = "FSTBankPU")
     private EntityManager em;
     
-    // Cache des notifications par client
-    private static Map<String, NotificationClient> notificationsCache = new HashMap<>();
+    // State management
+    private NotificationClient notificationCourante;
+    private Map<Long, NotificationClient> notificationsSession;
     
-    @Override
-    public void activerNotifications(Long compteId, Long clientId) {
+    @PostConstruct
+    public void init() {
+        notificationsSession = new HashMap<>();
+        System.out.println(">>> GestionNotificationBean STATEFUL initialisé");
+    }
+    
+    @PreDestroy
+    public void cleanup() {
+        notificationsSession.clear();
+        notificationCourante = null;
+        System.out.println(">>> GestionNotificationBean STATEFUL nettoyé");
+    }
+    
+    public NotificationClient getNotificationCourante() {
+        return notificationCourante;
+    }
+    
+    public void setNotificationCourante(NotificationClient notification) {
+        this.notificationCourante = notification;
+    }
+    
+    public Map<Long, NotificationClient> getNotificationsSession() {
+        return notificationsSession;
+    }
         Compte compte = em.find(Compte.class, compteId);
         Client client = em.find(Client.class, clientId);
         
