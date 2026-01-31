@@ -1,6 +1,6 @@
 [
-  { "id": 1, "numero": "ACC001", "solde": 850000.00, "devise": "DZA", "type": "PARTICULIER_SIMPLE", "owner": "محمد علي" },
-  { "id": 2, "numero": "ACC002", "solde": 1850000.00, "devise": "DZA", "type": "PARTICULIER_PARTAGE", "owners": "محمد علي، فاطمة بن سالم" },
-  { "id": 3, "numero": "ACC003", "solde": 920000.00, "devise": "DZA", "type": "PARTICULIER_SIMPLE", "owner": "فاطمة بن سالم" },
-  { "id": 4, "numero": "ACC004", "solde": 12850000.00, "devise": "DZA", "type": "PROFESSIONNEL", "owner": "شركة التكنولوجيا" }
+  { "id": 1, "numero": "ACC001", "solde": 7000.00, "devise": "DZD", "type": "Simple", "owner": "Mohamed Ali" },
+  { "id": 2, "numero": "ACC002", "solde": 15000.00, "devise": "DZD", "type": "Partage", "owners": "Mohamed Ali, Fatima Ben Salem" },
+  { "id": 3, "numero": "ACC003", "solde": 7000.00, "devise": "DZD", "type": "Simple", "owner": "Fatima Ben Salem" },
+  { "id": 4, "numero": "ACC004", "solde": 105000.00, "devise": "DZD", "type": "Professionnel", "owner": "Societe Technologie" }
 ]
