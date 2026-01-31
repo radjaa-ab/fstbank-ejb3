@@ -7,20 +7,9 @@
     
     <display-name>FSTBANK Web Dashboard</display-name>
     
-    <!-- REST Servlet -->
-    <servlet>
-        <servlet-name>JAX-RS Servlet</servlet-name>
-        <servlet-class>javax.ws.rs.core.Application</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>JAX-RS Servlet</servlet-name>
-        <url-pattern>/api/*</url-pattern>
-    </servlet-mapping>
-    
     <!-- Default Welcome File -->
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+
 </web-app>

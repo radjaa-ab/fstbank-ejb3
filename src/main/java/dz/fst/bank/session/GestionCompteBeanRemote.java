@@ -16,6 +16,8 @@ public interface GestionCompteBeanRemote {
     Compte rechercherCompte(String numeroCompte);
     
     Compte rechercherCompteParId(Long id);
+
+    List<Compte> listerTousLesComptes();
     
     List<Compte> listerComptesClient(Long clientId);
     

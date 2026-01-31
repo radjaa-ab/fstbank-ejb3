@@ -139,6 +139,15 @@ public class GestionTransactionBean implements GestionTransactionBeanRemote {
     public Transaction consulterTransaction(Long transactionId) {
         return em.find(Transaction.class, transactionId);
     }
+
+    @Override
+    public List<Transaction> listerToutesLesTransactions() {
+        TypedQuery<Transaction> query = em.createQuery(
+            "SELECT t FROM Transaction t ORDER BY t.dateTransaction DESC",
+            Transaction.class
+        );
+        return query.getResultList();
+    }
     
     @Override
     public List<Transaction> listerTransactionsParPeriode(Long compteId, Date debut, Date fin) {

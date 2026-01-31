@@ -1,0 +1,6 @@
+[
+  { "id": 1, "montant": 250000.00, "devise": "DZA", "type": "DEPOT", "statut": "VALIDEE", "compte": "ACC001", "date": "2026-01-27 10:30:00" },
+  { "id": 2, "montant": 125000.00, "devise": "DZA", "type": "RETRAIT", "statut": "VALIDEE", "compte": "ACC003", "date": "2026-01-27 10:35:00" },
+  { "id": 3, "montant": 625000.00, "devise": "DZA", "type": "VIREMENT", "statut": "VALIDEE", "from": "ACC001", "to": "ACC004", "date": "2026-01-27 10:40:00" },
+  { "id": 4, "montant": 1250000.00, "devise": "DZA", "type": "RETRAIT", "statut": "REJETEE", "compte": "ACC003", "raison": "رصيد غير كافي", "date": "2026-01-27 10:45:00" }
+]

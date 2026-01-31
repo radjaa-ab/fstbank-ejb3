@@ -17,6 +17,8 @@ public interface GestionTransactionBeanRemote {
     List<Transaction> consulterHistorique(Long compteId);
     
     Transaction consulterTransaction(Long transactionId);
+
+    List<Transaction> listerToutesLesTransactions();
     
     List<Transaction> listerTransactionsParPeriode(Long compteId, Date debut, Date fin);
 }

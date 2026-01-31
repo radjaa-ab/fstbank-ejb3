@@ -1,8 +1,15 @@
-# FSTBANK - Implémentation EJB3 Complète
+# 🚀 FSTBANK - DEPLOYMENT READY (Everything Downloaded)
 
-## 📋 Vue d'ensemble
+## 📋 Overview
 
-FSTBANK est une application bancaire complète développée avec les technologies **EJB3**, **JPA/Hibernate** et **Design Patterns** avancés.
+FSTBANK is a complete banking application developed with **EJB3**, **JPA/Hibernate**, advanced **Design Patterns**, and a responsive **Web Dashboard**.
+
+### ⚠️ Current Status: 80% Complete
+- ✅ Maven 3.8.6 - Downloaded & Extracted
+- ✅ Java 17 - Ready
+- ⏳ WildFly 20 - Downloaded (needs extraction)
+- ⏳ Application Build - Ready to deploy
+- ⏳ Dashboard - Ready to run
 
 ### Caractéristiques principales
 

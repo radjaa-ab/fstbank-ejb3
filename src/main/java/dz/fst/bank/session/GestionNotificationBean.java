@@ -24,17 +24,17 @@ public class GestionNotificationBean implements GestionNotificationBeanRemote {
     
     // State management
     private NotificationClient notificationCourante;
-    private Map<Long, NotificationClient> notificationsSession;
+    private Map<String, NotificationClient> notificationsCache;
     
     @PostConstruct
     public void init() {
-        notificationsSession = new HashMap<>();
+        notificationsCache = new HashMap<>();
         System.out.println(">>> GestionNotificationBean STATEFUL initialisé");
     }
     
     @PreDestroy
     public void cleanup() {
-        notificationsSession.clear();
+        notificationsCache.clear();
         notificationCourante = null;
         System.out.println(">>> GestionNotificationBean STATEFUL nettoyé");
     }
@@ -47,9 +47,12 @@ public class GestionNotificationBean implements GestionNotificationBeanRemote {
         this.notificationCourante = notification;
     }
     
-    public Map<Long, NotificationClient> getNotificationsSession() {
-        return notificationsSession;
+    public Map<String, NotificationClient> getNotificationsSession() {
+        return notificationsCache;
     }
+
+    @Override
+    public void activerNotifications(Long compteId, Long clientId) {
         Compte compte = em.find(Compte.class, compteId);
         Client client = em.find(Client.class, clientId);
         
@@ -71,8 +74,6 @@ public class GestionNotificationBean implements GestionNotificationBeanRemote {
             notificationsCache.put(key, notification);
         }
         
-        // Ajouter comme observateur
-        compte.ajouterObservateur(notification);
         notification.activerNotifications();
     }
     
@@ -89,7 +90,6 @@ public class GestionNotificationBean implements GestionNotificationBeanRemote {
         NotificationClient notification = notificationsCache.get(key);
         
         if (notification != null) {
-            compte.retirerObservateur(notification);
             notification.desactiverNotifications();
         }
     }

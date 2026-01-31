@@ -134,6 +134,15 @@ public class GestionCompteBean implements GestionCompteBeanRemote {
     public Compte rechercherCompteParId(Long id) {
         return em.find(Compte.class, id);
     }
+
+    @Override
+    public List<Compte> listerTousLesComptes() {
+        TypedQuery<Compte> query = em.createQuery(
+            "SELECT c FROM Compte c ORDER BY c.numeroCompte",
+            Compte.class
+        );
+        return query.getResultList();
+    }
     
     @Override
     public List<Compte> listerComptesClient(Long clientId) {

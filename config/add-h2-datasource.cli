@@ -1,0 +1,14 @@
+# WildFly CLI script to add H2 datasource for FSTBank
+embed-server --server-config=standalone.xml
+
+# Add H2 datasource
+data-source add --name=FSTBankDS \
+    --jndi-name=java:/FSTBankDS \
+    --driver-name=h2 \
+    --connection-url=jdbc:h2:mem:fstbank;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE \
+    --user-name=sa \
+    --password=sa \
+    --use-java-context=true \
+    --enabled=true
+
+stop-embedded-server
