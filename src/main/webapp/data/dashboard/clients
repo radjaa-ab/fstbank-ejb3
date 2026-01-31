@@ -1,1 +1,3 @@
-[ { "id": 1, "identifiant": "C001", "nom": "Dupont", "prenom": "Jean", "email": "jean@gmail.com", "type": "PARTICULIER" }, { "id": 2, "identifiant": "C002", "nom": "Martin", "prenom": "Marie", "email": "marie@gmail.com", "type": "PARTICULIER" }, { "id": 3, "identifiant": "CP001", "nom": "TechCorp", "prenom": "SA", "email": "contact@techcorp.dz", "type": "PROFESSIONNEL", "siret": "12345678901234" } ]
+[ { "id": 1, "identifiant": "C001", "nom": "Ali", "prenom": "Mohamed", "email": "mohamad.ali@gmail.com", "type": "PARTICULIER" }, 
+{ "id": 2, "identifiant": "C002", "nom": "Ben Salem", "prenom": "Fatima", "email": "fatima.salem@gmail.com", "type": "PARTICULIER" },
+ { "id": 3, "identifiant": "CP001", "nom": "Societe Technologie", "prenom": "Sarl", "email": "contact@techno.dz", "type": "PROFESSIONNEL", "siret": "12345678901234" } ]

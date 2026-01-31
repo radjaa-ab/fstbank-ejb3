@@ -369,7 +369,7 @@
         
         async function loadStats() {
             try {
-                const response = await fetch(API_BASE + '/stats');
+                const response = await fetch(API_BASE + '/stats?t=' + Date.now(), { cache: 'no-store' });
                 const stats = await response.json();
 
                 currentCurrency = stats.devise || 'DZD';
@@ -398,7 +398,7 @@
         
         async function loadClients() {
             try {
-                const response = await fetch(API_BASE + '/clients');
+                const response = await fetch(API_BASE + '/clients?t=' + Date.now(), { cache: 'no-store' });
                 const clients = await response.json();
 
                 if (!clients || clients.length === 0) {
@@ -433,7 +433,7 @@
         
         async function loadAccounts() {
             try {
-                const response = await fetch(API_BASE + '/accounts');
+                const response = await fetch(API_BASE + '/accounts?t=' + Date.now(), { cache: 'no-store' });
                 const accounts = await response.json();
 
                 if (!accounts || accounts.length === 0) {
@@ -466,7 +466,7 @@
         
         async function loadTransactions() {
             try {
-                const response = await fetch(API_BASE + '/transactions');
+                const response = await fetch(API_BASE + '/transactions?t=' + Date.now(), { cache: 'no-store' });
                 const transactions = await response.json();
 
                 if (!transactions || transactions.length === 0) {

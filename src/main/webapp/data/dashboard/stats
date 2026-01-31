@@ -1,1 +1,1 @@
-{ "totalClients": 3, "totalAccounts": 4, "totalTransactions": 4, "totalBalance": 129000.00, "validatedTransactions": 3, "rejectedTransactions": 1, "successRate": 75.0 }
+{ "totalClients": 3, "totalAccounts": 4, "totalTransactions": 4, "totalBalance": 134000.00, "devise": "DZD", "validatedTransactions": 3, "rejectedTransactions": 1, "successRate": 75.0 }
