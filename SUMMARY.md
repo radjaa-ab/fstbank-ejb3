@@ -84,3 +84,13 @@ fstbank-ejb3/
 ---
 
 **Ready to deploy!** 🎉
+
+
+**🚀 To Run Tests Anytime:**
+
+$env:JAVA_HOME = "C:\jdk17\jdk-17.0.10+7"
+$env:Path += ";$env:JAVA_HOME\bin"
+cd "C:\Users\DELL\Desktop\adla project"
+
+javac -encoding UTF-8 -d bin src/main/java/dz/fst/bank/test/ComprehensiveTest.java
+java -cp bin dz.fst.bank.test.ComprehensiveTest

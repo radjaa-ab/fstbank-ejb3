@@ -5,207 +5,237 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FSTBANK Dashboard</title>
     <style>
+        :root {
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #1f2a44;
+            --muted: #7b889c;
+            --primary: #3751ff;
+            --primary-2: #5f7bff;
+            --accent: #ffb020;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --border: #e6eaf1;
+            --shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px;
         }
-        
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
-        
         header {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+            background: linear-gradient(120deg, #1f2a44, #2c3e77);
+            color: #fff;
+            padding: 28px 32px;
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
         }
-        
+        header::after {
+            content: '';
+            position: absolute;
+            right: -80px;
+            top: -60px;
+            width: 220px;
+            height: 220px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+        }
         h1 {
-            color: #2c3e50;
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 2.4em;
+            margin-bottom: 6px;
         }
-        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.78);
+        }
         .status {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 16px;
         }
-        
         .status-indicator {
             width: 12px;
             height: 12px;
-            background: #27ae60;
+            background: #3ddc97;
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
-        
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 8px rgba(39, 174, 96, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(39, 174, 96, 0);
-            }
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-top: 14px;
+            flex-wrap: wrap;
         }
-        
+        .refresh-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .refresh-btn:hover {
+            background: var(--primary-2);
+        }
+        .pill {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 0.9em;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(61, 220, 151, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0); }
+        }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
         }
-        
         .stat-card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border-left: 5px solid #667eea;
+            background: var(--card);
+            padding: 22px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
         }
-        
-        .stat-card.clients { border-left-color: #3498db; }
-        .stat-card.accounts { border-left-color: #27ae60; }
-        .stat-card.transactions { border-left-color: #f39c12; }
-        .stat-card.balance { border-left-color: #e74c3c; }
-        
-        .stat-label {
-            color: #7f8c8d;
-            font-size: 0.9em;
+        .stat-card h3 {
+            font-size: 0.95em;
+            color: var(--muted);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 8px;
         }
-        
         .stat-value {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #2c3e50;
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-top: 10px;
         }
-        
+        .stat-meta {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 0.9em;
+        }
+        .insights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+        .insight-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .progress {
+            width: 100%;
+            height: 10px;
+            background: #eef2f7;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        .progress > span {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+        }
         .data-section {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+            background: var(--card);
+            padding: 26px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
         }
-        
         .section-title {
-            color: #2c3e50;
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            font-size: 1.4em;
+            margin-bottom: 12px;
         }
-        
+        .section-subtitle {
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+        .table-wrap {
+            overflow-x: auto;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 6px;
         }
-        
         th {
-            background: #667eea;
-            color: white;
-            padding: 15px;
+            background: #f1f5ff;
+            color: #1f2a44;
+            padding: 14px;
             text-align: left;
-            font-weight: 600;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
         }
-        
         td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #ecf0f1;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
         }
-        
         tr:hover {
-            background: #f8f9fa;
+            background: #f9fbff;
         }
-        
         .badge {
             display: inline-block;
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.85em;
+            font-size: 0.82em;
             font-weight: 600;
         }
-        
-        .badge-valid {
-            background: #d5f4e6;
-            color: #27ae60;
-        }
-        
-        .badge-rejected {
-            background: #fadbd8;
-            color: #e74c3c;
-        }
-        
-        .badge-simple {
-            background: #d6eaf8;
-            color: #3498db;
-        }
-        
-        .badge-partage {
-            background: #d5f4e6;
-            color: #27ae60;
-        }
-        
-        .badge-pro {
-            background: #fdebd0;
-            color: #d68910;
-        }
-        
+        .badge-valid { background: #dcfce7; color: #15803d; }
+        .badge-rejected { background: #fee2e2; color: #b91c1c; }
+        .badge-simple { background: #dbeafe; color: #1d4ed8; }
+        .badge-partage { background: #dcfce7; color: #15803d; }
+        .badge-pro { background: #fef3c7; color: #b45309; }
+        .badge-muted { background: #eef2f7; color: #64748b; }
         .loading {
             text-align: center;
             padding: 40px;
-            color: #7f8c8d;
+            color: var(--muted);
         }
-        
         .error {
-            background: #fadbd8;
-            color: #c0392b;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-        }
-        
-        footer {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 14px;
             border-radius: 10px;
+            margin: 12px 0;
+        }
+        footer {
+            background: var(--card);
+            padding: 16px;
+            border-radius: 14px;
             text-align: center;
-            color: #7f8c8d;
-            margin-top: 30px;
+            color: var(--muted);
+            border: 1px solid var(--border);
         }
-        
-        .refresh-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            float: right;
+        .muted {
+            color: var(--muted);
         }
-        
-        .refresh-btn:hover {
-            background: #764ba2;
+        @media (max-width: 700px) {
+            body { padding: 16px; }
+            h1 { font-size: 2em; }
         }
     </style>
 </head>
@@ -213,49 +243,80 @@
     <div class="container">
         <header>
             <h1>🏦 FSTBANK Dashboard</h1>
+            <div class="subtitle">Suivi temps réel des clients, comptes et transactions</div>
             <div class="status">
                 <div class="status-indicator"></div>
                 <span id="app-status">Application RUNNING</span>
-                <button class="refresh-btn" onclick="loadAllData()">🔄 Refresh</button>
+            </div>
+            <div class="toolbar">
+                <button class="refresh-btn" onclick="loadAllData()">🔄 Rafraîchir</button>
+                <span class="pill" id="last-update">Dernière mise à jour : —</span>
+                <span class="pill" id="currency-pill">Devise : —</span>
             </div>
         </header>
         
         <!-- Statistics Cards -->
         <div class="stats-grid">
             <div class="stat-card clients">
-                <div class="stat-label">Total Clients</div>
+                <h3>Total Clients</h3>
                 <div class="stat-value" id="stat-clients">-</div>
+                <div class="stat-meta" id="meta-clients">Clients actifs</div>
             </div>
             <div class="stat-card accounts">
-                <div class="stat-label">Total Accounts</div>
+                <h3>Total Comptes</h3>
                 <div class="stat-value" id="stat-accounts">-</div>
+                <div class="stat-meta" id="meta-accounts">Comptes ouverts</div>
             </div>
             <div class="stat-card transactions">
-                <div class="stat-label">Total Transactions</div>
+                <h3>Total Transactions</h3>
                 <div class="stat-value" id="stat-transactions">-</div>
+                <div class="stat-meta" id="meta-transactions">Toutes opérations</div>
             </div>
             <div class="stat-card balance">
-                <div class="stat-label">Total Balance</div>
+                <h3>Total Encours</h3>
                 <div class="stat-value" id="stat-balance">-</div>
+                <div class="stat-meta" id="meta-balance">Somme des soldes</div>
+            </div>
+        </div>
+
+        <div class="insights">
+            <div class="insight-card">
+                <h3>Taux de réussite</h3>
+                <div class="stat-value" id="success-rate">—</div>
+                <div class="progress"><span id="success-bar" style="width: 0%"></span></div>
+                <div class="stat-meta" id="success-meta">Transactions validées</div>
+            </div>
+            <div class="insight-card">
+                <h3>Qualité des transactions</h3>
+                <div class="stat-value" id="tx-quality">—</div>
+                <div class="stat-meta" id="tx-quality-meta">Validées / Rejetées</div>
+            </div>
+            <div class="insight-card">
+                <h3>Dernière synchronisation</h3>
+                <div class="stat-value" id="sync-time">—</div>
+                <div class="stat-meta">Mise à jour automatique toutes les 30s</div>
             </div>
         </div>
         
         <!-- Clients Section -->
         <div class="data-section">
             <h2 class="section-title">👥 Clients</h2>
-            <div id="clients-container" class="loading">Loading clients...</div>
+            <div class="section-subtitle">Vue d’ensemble des profils particuliers et professionnels</div>
+            <div id="clients-container" class="loading">Chargement des clients...</div>
         </div>
         
         <!-- Accounts Section -->
         <div class="data-section">
             <h2 class="section-title">💳 Comptes Bancaires</h2>
-            <div id="accounts-container" class="loading">Loading accounts...</div>
+            <div class="section-subtitle">Solde et typologie des comptes</div>
+            <div id="accounts-container" class="loading">Chargement des comptes...</div>
         </div>
         
         <!-- Transactions Section -->
         <div class="data-section">
             <h2 class="section-title">💰 Transactions</h2>
-            <div id="transactions-container" class="loading">Loading transactions...</div>
+            <div class="section-subtitle">Historique détaillé des opérations</div>
+            <div id="transactions-container" class="loading">Chargement des transactions...</div>
         </div>
         
         <footer>
@@ -266,11 +327,20 @@
     <script>
         const API_BASE = '/fstbank/data/dashboard';
         
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('fr-FR', {
+        let currentCurrency = 'DZD';
+
+        function formatCurrency(value, currency = 'DZD') {
+            return new Intl.NumberFormat('fr-DZ', {
                 style: 'currency',
-                currency: 'EUR'
+                currency
             }).format(value);
+        }
+
+        function formatDateTime(date = new Date()) {
+            return new Intl.DateTimeFormat('fr-FR', {
+                dateStyle: 'medium',
+                timeStyle: 'short'
+            }).format(date);
         }
         
         function getTypeBadge(type) {
@@ -301,11 +371,26 @@
             try {
                 const response = await fetch(API_BASE + '/stats');
                 const stats = await response.json();
-                
-                document.getElementById('stat-clients').textContent = stats.totalClients;
-                document.getElementById('stat-accounts').textContent = stats.totalAccounts;
-                document.getElementById('stat-transactions').textContent = stats.totalTransactions;
-                document.getElementById('stat-balance').textContent = formatCurrency(stats.totalBalance);
+
+                currentCurrency = stats.devise || 'DZD';
+                document.getElementById('currency-pill').textContent = `Devise : ${currentCurrency}`;
+
+                document.getElementById('stat-clients').textContent = stats.totalClients ?? 0;
+                document.getElementById('stat-accounts').textContent = stats.totalAccounts ?? 0;
+                document.getElementById('stat-transactions').textContent = stats.totalTransactions ?? 0;
+                document.getElementById('stat-balance').textContent = formatCurrency(stats.totalBalance ?? 0, currentCurrency);
+
+                const successRate = stats.successRate ?? 0;
+                document.getElementById('success-rate').textContent = `${successRate}%`;
+                document.getElementById('success-bar').style.width = `${Math.min(100, successRate)}%`;
+                document.getElementById('success-meta').textContent = `${stats.validatedTransactions ?? 0} validées sur ${stats.totalTransactions ?? 0}`;
+
+                document.getElementById('tx-quality').textContent = `${stats.validatedTransactions ?? 0} / ${stats.rejectedTransactions ?? 0}`;
+                document.getElementById('tx-quality-meta').textContent = 'Validées / Rejetées';
+
+                const now = formatDateTime();
+                document.getElementById('sync-time').textContent = now;
+                document.getElementById('last-update').textContent = `Dernière mise à jour : ${now}`;
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
@@ -315,28 +400,34 @@
             try {
                 const response = await fetch(API_BASE + '/clients');
                 const clients = await response.json();
-                
-                let html = '<table><thead><tr><th>ID</th><th>Identifiant</th><th>Nom</th><th>Email</th><th>Type</th></tr></thead><tbody>';
-                
+
+                if (!clients || clients.length === 0) {
+                    document.getElementById('clients-container').innerHTML = '<div class="muted">Aucun client disponible pour le moment.</div>';
+                    return;
+                }
+
+                let html = '<div class="table-wrap"><table><thead><tr><th>ID</th><th>Identifiant</th><th>Nom</th><th>Email</th><th>Type</th><th>SIRET</th></tr></thead><tbody>';
+
                 clients.forEach(client => {
-                    const typeBadge = client.type === 'PROFESSIONNEL' 
+                    const typeBadge = client.type === 'PROFESSIONNEL'
                         ? '<span class="badge badge-pro">Pro</span>'
                         : '<span class="badge badge-simple">Part</span>';
-                    
+
                     html += `<tr>
                         <td>${client.id}</td>
                         <td><strong>${client.identifiant}</strong></td>
-                        <td>${client.nom} ${client.prenom}</td>
+                        <td>${client.nom} ${client.prenom || ''}</td>
                         <td>${client.email}</td>
                         <td>${typeBadge}</td>
+                        <td>${client.siret || '<span class="badge badge-muted">—</span>'}</td>
                     </tr>`;
                 });
-                
-                html += '</tbody></table>';
+
+                html += '</tbody></table></div>';
                 document.getElementById('clients-container').innerHTML = html;
             } catch (error) {
                 console.error('Error loading clients:', error);
-                document.getElementById('clients-container').innerHTML = '<div class="error">Failed to load clients</div>';
+                document.getElementById('clients-container').innerHTML = '<div class="error">Impossible de charger les clients.</div>';
             }
         }
         
@@ -344,25 +435,32 @@
             try {
                 const response = await fetch(API_BASE + '/accounts');
                 const accounts = await response.json();
-                
-                let html = '<table><thead><tr><th>ID</th><th>Numéro</th><th>Solde</th><th>Type</th><th>Propriétaire</th></tr></thead><tbody>';
-                
+
+                if (!accounts || accounts.length === 0) {
+                    document.getElementById('accounts-container').innerHTML = '<div class="muted">Aucun compte disponible pour le moment.</div>';
+                    return;
+                }
+
+                let html = '<div class="table-wrap"><table><thead><tr><th>ID</th><th>Numéro</th><th>Solde</th><th>Devise</th><th>Type</th><th>Propriétaire</th></tr></thead><tbody>';
+
                 accounts.forEach(account => {
                     const owner = account.owner || account.owners || 'N/A';
+                    const devise = account.devise || currentCurrency;
                     html += `<tr>
                         <td>${account.id}</td>
                         <td><strong>${account.numero}</strong></td>
-                        <td style="font-weight: 600; color: #27ae60;">${formatCurrency(account.solde)}</td>
+                        <td style="font-weight: 700; color: #16a34a;">${formatCurrency(account.solde, devise)}</td>
+                        <td>${devise}</td>
                         <td>${getTypeBadge(account.type)}</td>
                         <td>${owner}</td>
                     </tr>`;
                 });
-                
-                html += '</tbody></table>';
+
+                html += '</tbody></table></div>';
                 document.getElementById('accounts-container').innerHTML = html;
             } catch (error) {
                 console.error('Error loading accounts:', error);
-                document.getElementById('accounts-container').innerHTML = '<div class="error">Failed to load accounts</div>';
+                document.getElementById('accounts-container').innerHTML = '<div class="error">Impossible de charger les comptes.</div>';
             }
         }
         
@@ -370,29 +468,38 @@
             try {
                 const response = await fetch(API_BASE + '/transactions');
                 const transactions = await response.json();
-                
-                let html = '<table><thead><tr><th>ID</th><th>Montant</th><th>Type</th><th>Statut</th><th>Comptes</th><th>Date</th></tr></thead><tbody>';
-                
+
+                if (!transactions || transactions.length === 0) {
+                    document.getElementById('transactions-container').innerHTML = '<div class="muted">Aucune transaction disponible pour le moment.</div>';
+                    return;
+                }
+
+                let html = '<div class="table-wrap"><table><thead><tr><th>ID</th><th>Montant</th><th>Devise</th><th>Type</th><th>Statut</th><th>Comptes</th><th>Date</th><th>Raison</th></tr></thead><tbody>';
+
                 transactions.forEach(tx => {
-                    const comptes = tx.from && tx.to 
+                    const comptes = tx.from && tx.to
                         ? `${tx.from} → ${tx.to}`
                         : (tx.compte || 'N/A');
-                    
+                    const devise = tx.devise || currentCurrency;
+                    const reason = tx.raison ? tx.raison : '<span class="badge badge-muted">—</span>';
+
                     html += `<tr>
                         <td>${tx.id}</td>
-                        <td style="font-weight: 600; color: #e74c3c;">${formatCurrency(tx.montant)}</td>
+                        <td style="font-weight: 700; color: #ef4444;">${formatCurrency(tx.montant, devise)}</td>
+                        <td>${devise}</td>
                         <td><strong>${tx.type}</strong></td>
                         <td>${getStatusBadge(tx.statut)}</td>
                         <td>${comptes}</td>
                         <td>${tx.date}</td>
+                        <td>${reason}</td>
                     </tr>`;
                 });
-                
-                html += '</tbody></table>';
+
+                html += '</tbody></table></div>';
                 document.getElementById('transactions-container').innerHTML = html;
             } catch (error) {
                 console.error('Error loading transactions:', error);
-                document.getElementById('transactions-container').innerHTML = '<div class="error">Failed to load transactions</div>';
+                document.getElementById('transactions-container').innerHTML = '<div class="error">Impossible de charger les transactions.</div>';
             }
         }
         
